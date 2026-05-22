@@ -9,9 +9,10 @@
     crossorigin="anonymous"></script>
   <script type="text/javascript" src="https://s.hatena.ne.jp/js/HatenaStar.js"></script>
   <style>
-    body { margin: 0; padding: 0; background: transparent; }
-    #container { padding: 2px 0; }
-    #hatena-star-container { padding-top: 4px; }
+    html, body { margin: 0; padding: 0; background: transparent; overflow: visible; }
+    #container { padding: 2px 0; overflow: visible; }
+    /* ホバー時のポップアップが上方向に展開するよう余白を確保 */
+    #hatena-star-container { padding-top: 60px; margin-top: -60px; overflow: visible; }
   </style>
 </head>
 <body>
