@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>Hatena Star</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+    integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+    crossorigin="anonymous"></script>
+  <script type="text/javascript" src="https://s.hatena.ne.jp/js/HatenaStar.js"></script>
+  <style>
+    body { margin: 0; padding: 0; background: transparent; }
+    #container { padding: 2px 0; }
+    #hatena-star-container { padding-top: 4px; }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <!-- タイトル・URLはURLパラメータから動的に設定（非表示） -->
+    <div style="display:none;">
+      <a id="h-uri" href="http://example.com">
+        <h3 id="h-title">Hatena Star</h3>
+      </a>
+    </div>
+    <div id="hatena-star-container"></div>
+  </div>
+
+  <!-- URLパラメータ(title, url)を取得してDOMへ反映 -->
+  <script>
+    var params = new URLSearchParams(window.location.search);
+    var title  = params.get('title') || '';
+    var url    = params.get('url')   || '';
+    document.querySelector('#h-title').innerText = title;
+    document.querySelector('#h-uri').href = url;
+  </script>
+
+  <!-- amp-iframe との高さ同期（SPA iframe内でも動作） -->
+  <script>
+    window.addEventListener('message', function(event) {
+      if (!event.data) return;
+      var msg;
+      try { msg = JSON.parse(event.data); } catch (e) { return; }
+      if (!msg) return;
+      if (msg.name === 'resize' || msg.name === 'rendered') {
+        window.parent.postMessage({
+          sentinel: 'amp',
+          type: 'embed-size',
+          height: msg.data.height
+        }, '*');
+      }
+    }, false);
+  </script>
+
+  <!-- はてなスター SiteConfig -->
+  <script>
+    Hatena.Star.SiteConfig = {
+      entryNodes: {
+        'div#container': {
+          uri:       'a',
+          title:     'h3',
+          container: 'div#hatena-star-container'
+        }
+      }
+    };
+  </script>
+
+  <!-- スター押下時に別タブで開く（iframe内での遷移を防ぐ） -->
+  <script>
+    $(function() {
+      // ShadowDOM が構築されるのを少し待つ
+      setTimeout(function() {
+        var el = document.querySelector('#hatena-star-container span');
+        if (!el || !el.shadowRoot) return;
+        el.shadowRoot.addEventListener('click', function(e) {
+          e.preventDefault();
+          var a = $(e.target).parent()[0];
+          if (a && a.href) window.open(a.href, '_blank');
+        });
+      }, 2000);
+    });
+  </script>
+</body>
+</html>
